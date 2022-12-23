@@ -6,9 +6,9 @@ import Newsletter from './_child/Newsletter'
 export default function footer() {
   return (
     <footer className="bg-gray-50">
+      <Newsletter />
       <div className="container mx-auto flex justify-center py-12">
         <div className="py-5">
-          <Newsletter />
           <div className="flex gap-6 justify-center">
             <Link href="/" legacyBehavior>
               <a>
