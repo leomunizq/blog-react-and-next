@@ -1,6 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Author from './_child/author.jsx'
+import fetcher from '../lib/fetcher'
+import Spinner from './_child/Spinner'
+import Error from './_child/Error'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -8,8 +11,13 @@ import SwiperCore, { Autoplay } from 'swiper'
 
 // Import Swiper styles
 import 'swiper/css'
+import { data } from 'autoprefixer'
 
 export default function section1() {
+  const { data, isLoading, isError } = fetcher('api/trending')
+
+  if (isLoading) return <Spinner></Spinner>
+  if (isError) return <Error></Error>
   SwiperCore.use([Autoplay])
 
   const bg = {
@@ -21,29 +29,27 @@ export default function section1() {
       <div className="container mx-auto md:px-20">
         <h1 className="font-bold text-4xl pb-12 text-center">Trending</h1>
 
-        <Swiper
-          slidesPerView={1}
-          //  autoplay={{ delay: 2000 }}
-          // loop={true}
-        >
-          <SwiperSlide> {slide()}</SwiperSlide>
-          <SwiperSlide> {slide()}</SwiperSlide>
-          <SwiperSlide> {slide()}</SwiperSlide>
-          <SwiperSlide> {slide()}</SwiperSlide>
+        <Swiper slidesPerView={1} autoplay={{ delay: 2000 }} loop={true}>
+          {data.map((value, index) => (
+            <SwiperSlide key={index}>
+              <Slide data={value}></Slide>
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </section>
   )
 }
 
-function slide() {
+function Slide({ data }) {
+  const { id, title, category, img, published, author, description } = data
   return (
     <div className="grid md:grid-cols-2">
       <div className="image">
-        <Link href={'/'} legacyBehavior>
+        <Link href={`/postsTrending/${id}`} legacyBehavior>
           <a>
             <Image
-              src={'/images/img1.jpg'}
+              src={img || '/images/img1.jpg'}
               width={600}
               height={600}
               alt="image"
@@ -54,19 +60,21 @@ function slide() {
 
       <div className="info flex justify-center flex-col">
         <div className="cat">
-          <Link href={'/'} legacyBehavior>
+          <Link href={`/postsTrending/${id}`} legacyBehavior>
             <a className="text-orange-600 hover:text-orange-800">
-              Business, Travel
+              {category || 'unknown'}
             </a>
           </Link>
-          <Link href={'/'} legacyBehavior>
-            <a className="text-gray-800 hover:text-gray-600"> -July 3, 2014</a>
+          <Link href={`/postsTrending/${id}`} legacyBehavior>
+            <a className="text-gray-800 hover:text-gray-600">
+              - {published || 'Unknown'}
+            </a>
           </Link>
         </div>
         <div className="title">
-          <Link href={'/'} legacyBehavior>
+          <Link href={`/postsTrending/${id}`} legacyBehavior>
             <a className="text-3xl md:text-6xl font-bold text-gray-800 hover:text-gray-600">
-              title lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              {title || 'unknown'}
             </a>
           </Link>
         </div>
@@ -74,7 +82,7 @@ function slide() {
           lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem
           ipsum dolor sit amet, consectetur adipiscing elit. Sed
         </p>
-        <Author />
+        {author ? <Author></Author> : <></>}
       </div>
     </div>
   )

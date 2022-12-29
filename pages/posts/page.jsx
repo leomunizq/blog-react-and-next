@@ -2,6 +2,7 @@ import React from 'react'
 import Format from '../../layout/format'
 import Author from '../../components/_child/author'
 import Image from 'next/image'
+import Related from '../../components/_child/Related'
 
 export default function page() {
   return (
@@ -48,6 +49,7 @@ export default function page() {
             </p>
           </div>
         </div>
+        <Related />
       </section>
     </Format>
   )

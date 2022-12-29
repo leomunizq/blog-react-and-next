@@ -2,11 +2,19 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Author from './_child/author'
+import fetcher from '../lib/fetcher'
+import Spinner from './_child/Spinner'
+import Error from './_child/Error'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 export default function section3() {
+  const { data, isLoading, isError } = fetcher('api/popular')
+
+  if (isLoading) return <Spinner></Spinner>
+  if (isError) return <Error></Error>
+
   return (
     <section className="container mx-auto md:px-20 py-16">
       <h1 className="font-bold text-4xl py-12 text-center">Most Popular</h1>
@@ -15,23 +23,25 @@ export default function section3() {
         //  autoplay={{ delay: 2000 }}
         // loop={true}
       >
-        <SwiperSlide> {Post()}</SwiperSlide>
-        <SwiperSlide> {Post()}</SwiperSlide>
-        <SwiperSlide> {Post()}</SwiperSlide>
-        <SwiperSlide> {Post()}</SwiperSlide>
+        {data.map((value, index) => (
+          <SwiperSlide key={index}>
+            <Post data={value}></Post>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </section>
   )
 }
 
-function Post() {
+function Post({ data }) {
+  const { id, title, category, img, published, author, description } = data
   return (
     <div className="item">
       <div className="images">
-        <Link href={'/'} legacyBehavior>
+        <Link href={`/posts/${id}`} legacyBehavior>
           <a>
             <Image
-              src={'/images/img1.jpg'}
+              src={img || 'images/img1.jpg'}
               width={600}
               height={40}
               alt="image"
@@ -41,19 +51,22 @@ function Post() {
       </div>
       <div className="info flex justify-center flex-col py-4">
         <div className="cat">
-          <Link href={'/'} legacyBehavior>
+          <Link href={`/posts/${id}`} legacyBehavior>
             <a className="text-orange-600 hover:text-orange-800">
-              Business, Travel
+              {category || 'unknown category'}
             </a>
           </Link>
-          <Link href={'/'} legacyBehavior>
-            <a className="text-gray-800 hover:text-gray-600"> -July 3, 2014</a>
+          <Link href={`/posts/${id}`} legacyBehavior>
+            <a className="text-gray-800 hover:text-gray-600">
+              {' '}
+              - {published || 'unknown date'}
+            </a>
           </Link>
         </div>
         <div className="title">
-          <Link href={'/'} legacyBehavior>
+          <Link href={`/posts/${id}`} legacyBehavior>
             <a className="text-2xl md:text-3xl font-bold text-gray-800 hover:text-gray-600">
-              title lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              {title || 'unknown title'}
             </a>
           </Link>
         </div>
@@ -61,7 +74,7 @@ function Post() {
           lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem
           ipsum dolor sit amet, consectetur adipiscing elit. Sed
         </p>
-        <Author />
+        {author ? <Author></Author> : <></>}
       </div>
     </div>
   )
